@@ -84,9 +84,10 @@ module eks {
   source  = "terraform-aws-modules/eks/aws"
   version = "11.0.0"
 
-  cluster_name    = local.name
-  cluster_version = var.cluster_version
-  map_users       = local.map_users
+  cluster_name       = local.name
+  cluster_version    = var.cluster_version
+  config_output_path = format("%s/.kube/config", pathexpand("~"))
+  map_users          = local.map_users
 
   // TODO(jasonwalsh): allow user to specify subnets or use subnets from VPC module
   subnets = module.vpc.public_subnets
