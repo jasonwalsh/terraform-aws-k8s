@@ -7,6 +7,7 @@ locals {
       username = user
     }
   ]
+
   name   = coalesce(var.name, random_pet.pet.id)
   tags   = merge(var.tags, map("terraform", true))
   vpc_id = coalesce(var.vpc_id, module.vpc.vpc_id)
