@@ -3,7 +3,7 @@ locals {
     for i, user in var.users :
     {
       groups   = ["system:masters"]
-      userarn  = element(data.aws_iam_user.iam_user.*.arn)
+      userarn  = element(data.aws_iam_user.iam_user.*.arn, i)
       username = user
     }
   ]
