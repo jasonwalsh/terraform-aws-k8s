@@ -6,16 +6,16 @@ resource kubernetes_service metrics_server {
     }
 
     name      = "metrics-server"
-    namespace = "" // TODO(jasonwalsh): use namespace resource
-  }
-
-  port {
-    port        = 443
-    protocol    = "TCP"
-    target_port = 443
+    namespace = "kube-system"
   }
 
   spec {
+    port {
+      port        = 443
+      protocol    = "TCP"
+      target_port = 443
+    }
+
     selector = {
       k8s-app = "metrics-server"
     }

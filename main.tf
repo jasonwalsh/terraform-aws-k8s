@@ -8,9 +8,10 @@ locals {
     }
   ]
 
-  name   = coalesce(var.name, random_pet.pet.id)
-  tags   = merge(var.tags, map("terraform", true))
-  vpc_id = coalesce(var.vpc_id, module.vpc.vpc_id)
+  name       = coalesce(var.name, random_pet.pet.id)
+  subnet_ids = coalescelist(var.subnet_ids, module.vpc.private_subnets)
+  tags       = merge(var.tags, map("terraform", true))
+  vpc_id     = coalesce(var.vpc_id, module.vpc.vpc_id)
 }
 
 data aws_availability_zones availability_zones {
@@ -46,14 +47,12 @@ module vpc {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.32.0"
 
-  azs                     = data.aws_availability_zones.availability_zones.names
-  cidr                    = var.cidr_block
-  create_vpc              = var.vpc_id != "" ? false : true
-  enable_dns_hostnames    = true
-  enable_dns_support      = true
-  enable_nat_gateway      = true
-  map_public_ip_on_launch = var.map_public_ip_on_launch
-  name                    = local.name
+  azs                  = data.aws_availability_zones.availability_zones.names
+  cidr                 = var.cidr_block
+  create_vpc           = var.vpc_id != "" ? false : true
+  enable_dns_hostnames = true
+  enable_nat_gateway   = true
+  name                 = local.name
 
   private_subnets = [
     "10.0.1.0/24",
@@ -89,11 +88,9 @@ module eks {
   cluster_version    = var.cluster_version
   config_output_path = format("%s/.kube/config", pathexpand("~"))
   map_users          = local.map_users
-
-  // TODO(jasonwalsh): allow user to specify subnets or use subnets from VPC module
-  subnets = module.vpc.public_subnets
-  tags    = local.tags
-  vpc_id  = local.vpc_id
+  subnets            = local.subnet_ids
+  tags               = local.tags
+  vpc_id             = local.vpc_id
 
   worker_groups = [
     {

@@ -23,7 +23,7 @@ resource kubernetes_cluster_role_binding metrics_server {
 
   subject {
     kind      = "ServiceAccount"
-    name      = "metrics-server"
-    namespace = "" // TODO(jasonwalsh): use namespace resource
+    name      = kubernetes_service_account.metrics_server.metadata[0].name
+    namespace = kubernetes_service_account.metrics_server.metadata[0].namespace
   }
 }
